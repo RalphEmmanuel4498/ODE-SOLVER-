@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this benchmark software or findings in academic research, please cite it as below."
+authors:
+  - family-names: "Research Group"
+    given-names: "Applied Mathematics and Scientific Computing"
+    affiliation: "Computational Mathematics Open-Source Initiative"
+title: "Semi-Analytical Method Benchmarking Framework for Nonlinear Differential Equations"
+version: 1.0.0
+date-released: 2026-10-23
+url: "https://github.com/open-science/semi_analytical_benchmark"
+keywords:
+  - "homotopy-analysis-method"
+  - "homotopy-perturbation-method"
+  - "adomian-decomposition-method"
+  - "variational-iteration-method"
+  - "nonlinear-differential-equations"
+  - "scientific-benchmarking"

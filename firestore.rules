@@ -1,0 +1,103 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Helper Primitives
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'google.com');
+    }
+
+    function isOwner(uid) {
+      return isVerifiedUser() && request.auth.uid == uid;
+    }
+
+    // Model Validation Helper
+    function isValidModel(data) {
+      return data.keys().hasAll(['userId', 'title', 'equations', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'userId', 'userEmail', 'title', 'description', 'equations', 'compartments', 'parameters', 'defaultParams', 'defaultInitialConditions', 'derivationMethod', 'derivationNotes', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 150
+        && (!('description' in data) || (data.description is string && data.description.size() <= 1000))
+        && data.equations is list && data.equations.size() > 0 && data.equations.size() <= 20 && data.equations[0] is string
+        && (!('compartments' in data) || (data.compartments is list && data.compartments.size() <= 20))
+        && (!('parameters' in data) || (data.parameters is list && data.parameters.size() <= 50))
+        && (!('derivationNotes' in data) || (data.derivationNotes is string && data.derivationNotes.size() <= 5000))
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    // User Profile Validation Helper
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'email', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'email', 'displayName', 'photoURL', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid
+        && data.email is string && data.email.size() <= 128
+        && (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128))
+        && (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500))
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    // User Profile Collection: users/{userId}
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false; // PII protection: prevent user enumerations
+      allow create: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming());
+      allow update: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'updatedAt']);
+      allow delete: if isValidId(userId) && isOwner(userId);
+    }
+
+    // Custom Models Collection: models/{modelId}
+    match /models/{modelId} {
+      // Secure List: evaluating resource.data against caller UID (The Query Enforcer)
+      allow list: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+      allow get: if isValidId(modelId) && isVerifiedUser() && resource.data.userId == request.auth.uid;
+      allow create: if isValidId(modelId)
+        && isVerifiedUser()
+        && isValidModel(incoming());
+      allow update: if isValidId(modelId)
+        && isVerifiedUser()
+        && isOwner(existing().userId)
+        && isValidModel(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'id', 'title', 'description', 'equations', 'compartments',
+          'parameters', 'defaultParams', 'defaultInitialConditions',
+          'derivationMethod', 'derivationNotes', 'updatedAt'
+        ]);
+      allow delete: if isValidId(modelId)
+        && isVerifiedUser()
+        && isOwner(existing().userId);
+    }
+  }
+}

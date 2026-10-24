@@ -1,0 +1,1214 @@
+\begin{equation}
+	\left.\begin{aligned}
+		\dfrac{dS}{dt} &= \Lambda + \delta\,R(t)
+		- \bigl(\beta_1 u_1(t)+\mu\bigr)S(t)\\[8pt]
+		\dfrac{dE}{dt} &= \beta_1 u_1(t)\,S(t)
+		- \bigl(\beta_2+\mu\bigr)E(t)\\[8pt]
+		\dfrac{dA}{dt} &= \beta_2\,E(t)
+		- \bigl(\beta_3 u_2(t)+\alpha+\mu\bigr)A(t)\\[8pt]
+		\dfrac{dC}{dt} &= \bigl(\beta_3 u_2(t)+\alpha\bigr)A(t)
+		- \bigl(\beta_4+\gamma+\mu\bigr)C(t)\\[8pt]
+		\dfrac{dL}{dt} &= \beta_4\,C(t) - \mu\,L(t)\\[8pt]
+		\dfrac{dR}{dt} &= \gamma\,C(t)
+		- \bigl(\delta+\mu\bigr)R(t)
+	\end{aligned}\right\}
+	\label{eq:model1}
+\end{equation}
+
+\noindent subject to the initial conditions:
+\begin{equation}
+	S(0)=S_0>0,\quad E(0)\geq 0,\quad A(0)\geq 0,\quad
+	C(0)=0,\quad L(0)=0,\quad R(0)=0.
+	\label{eq:ic1}
+\end{equation}
+
+System~\eqref{eq:model1} and Figure~\ref{fig:model1} correspond: each arrow is a term, all inflows and outflows accounted for. $S(t)$ receives recruitment $\Lambda$ and re-entry $\delta R$, loses to exposure and exit. $A(t)$ has three outflows: retargeting $\beta_3 u_2 A$, organic $\alpha A$, exit $\mu A$. $C(t)$ splits between loyalty $\beta_4$ and churn $\gamma$.
+
+\subsection{ State Variables, Controls, and Parameters}
+
+\begin{longtable}{@{}p{2.0cm}p{11.2cm}@{}}
+	\caption{State variables and controls}
+	\label{tab:var_m1}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{2}{l}{\small\textit{Table~\ref{tab:var_m1} continued}}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$S(t)$ & Susceptible: unaware consumers \\[4pt]
+	$E(t)$ & Exposed: received impression, no response \\[4pt]
+	$A(t)$ & Aware/Engaged: actively interacting \\[4pt]
+	$C(t)$ & Converted: completed purchase or sign-up \\[4pt]
+	$L(t)$ & Loyal: repeat customers \\[4pt]
+	$R(t)$ & Re-entered: churned consumers returned \\[4pt]
+	$N(t)$ & Total: $N(t)=S(t)+E(t)+A(t)+C(t)+L(t)+R(t)$ \\[4pt]
+	$u_1(t)$ & Reach control: governs $S \to E$, $0 \leq u_1(t) \leq u_1^{\max}$ \\[4pt]
+	$u_2(t)$ & Retargeting control: governs $A \to C$, $0 \leq u_2(t) \leq u_2^{\max}$ \\
+\end{longtable}
+
+\begin{longtable}{@{}p{2.0cm}p{11.2cm}@{}}
+	\caption{Model parameters}
+	\label{tab:par_m1}\\
+	\toprule
+	\textbf{Parameter} & \textbf{Description} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{2}{l}{\small\textit{Table~\ref{tab:par_m1} continued}}\\
+	\toprule
+	\textbf{Parameter} & \textbf{Description} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$\Lambda$ & Recruitment rate into $S(t)$ \\[4pt]
+	$\mu$ & Natural exit rate from all compartments \\[4pt]
+	$\beta_1$ & Exposure rate coefficient: $S \to E$ \\[4pt]
+	$\beta_2$ & Natural engagement rate: $E \to A$ \\[4pt]
+	$\alpha$ & Organic conversion rate: $A \to C$ \\[4pt]
+	$\beta_3$ & Retargeting conversion coefficient: $A \to C$ \\[4pt]
+	$\beta_4$ & Loyalty transition rate: $C \to L$ \\[4pt]
+	$\gamma$ & Churn rate: $C \to R$ \\[4pt]
+	$\delta$ & Re-entry rate: $R \to S$ \\
+\end{longtable}
+
+\subsection{Solution of the Baseline SEACLR System via the Homotopy Analysis Method}
+\label{sec:HAM}
+
+The baseline SEACLR system~\eqref{eq:model1} is solved using the Homotopy Analysis Method (HAM), a semi-analytical technique for obtaining approximate solutions of differential equations. A semi-analytical approach expresses the solution in an analytical series form while allowing approximation where an exact closed-form solution is difficult to obtain. This is appropriate for the present model because the six compartment equations are coupled and may not admit a simple closed-form solution.
+
+Table~\ref{tab:ham_notation} lists the symbols used in the Homotopy Analysis Method (HAM) and the Homotopy Perturbation Method (HPM). Each one is defined in full where it first appears in the derivation below. None of them is a parameter of the SEACLR model; they belong to the solution technique only.
+
+\begin{longtable}{@{}p{2.8cm}p{10.4cm}@{}}
+	\caption{Notation used in the HAM and HPM solution}
+	\label{tab:ham_notation}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{2}{l}{\small\textit{Table~\ref{tab:ham_notation} continued}}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$i$ & Compartment index, $i\in\{S,E,A,C,L,R\}$ \\[4pt]
+	$N_i$ & Operator that collects all terms of the $i$-th equation on the left-hand side, so that $N_i=0$ is the original equation \\[4pt]
+	$\mathcal{L}$ & Linear operator, $\mathcal{L}[\phi_i]=d\phi_i/dt$ \\[4pt]
+	$q\in[0,1]$ & Embedding parameter: $q=0$ gives the initial approximation and $q=1$ gives the solution of the original system \\[4pt]
+	$\phi_i(t;q)$ & Deformation function of compartment $i$. It moves continuously from $x_{i,0}(t)$ at $q=0$ to $x_i(t)$ at $q=1$ \\[4pt]
+	$\hbar\neq0$ & Convergence-control parameter of HAM. It is an auxiliary parameter, not a model parameter, and it scales the correction added at each order \\[4pt]
+	$\hbar=-1$ & Fixed value of $\hbar$ that defines HPM, so HPM is HAM at one particular value of $\hbar$ \\[4pt]
+	$x_{i,0}(t)$ & Initial approximation of compartment $i$, taken as $x_{i,0}(t)=x_i(0)$ \\[4pt]
+	$x_{i,m}(t)$ & $m$-th order correction of compartment $i$, the coefficient of $q^m$ in $\phi_i(t;q)$ \\[4pt]
+	$\mathbf{x}_m(t)$ & Vector of the six $m$-th order corrections $x_{S,m},x_{E,m},\dots,x_{R,m}$ \\[4pt]
+	$\rho_{i,k}(t)$ & $k$-th order residual of compartment $i$, the coefficient of $q^k$ in $N_i[\boldsymbol{\phi}(t;q)]$ \\[4pt]
+	$\mathbf{1}_{\{k=0\}}$ & Indicator, equal to $1$ when $k=0$ and $0$ otherwise. It places the constant $\Lambda$ at order $q^0$ only \\[4pt]
+	$\chi_m$ & Switch in the recurrence, with $\chi_1=0$ and $\chi_m=1$ for $m\geq2$ \\
+\end{longtable}
+
+
+For convenience, the equations in System~\eqref{eq:model1} are written with all terms on the left-hand side as
+\begin{align}
+	N_S &= \dot S-\Lambda-\delta R+(\beta_1u_1+\mu)S, \\
+	N_E &= \dot E-\beta_1u_1S+(\beta_2+\mu)E, \\
+	N_A &= \dot A-\beta_2E+(\beta_3u_2+\alpha+\mu)A, \\
+	N_C &= \dot C-(\beta_3u_2+\alpha)A+(\beta_4+\gamma+\mu)C, \\
+	N_L &= \dot L-\beta_4C+\mu L, \\
+	N_R &= \dot R-\gamma C+(\delta+\mu)R.
+	\label{eq:Nops}
+\end{align}
+Hence, the system can be expressed compactly as
+\begin{equation}
+	N_i[\mathbf{x}]=0,
+	\qquad i\in\{S,E,A,C,L,R\}.
+\end{equation}
+An initial approximation is taken from the initial value of each compartment:
+\begin{equation}
+	x_{i,0}(t)=x_i(0),
+	\qquad
+	\dot{x}_{i,0}(t)=0.
+\end{equation}
+To continuously deform this approximation into the required solution, an embedding parameter $q\in[0,1]$ and a function $\phi_i(t;q)$ are introduced. The value $q=0$ represents the initial approximation, whereas $q=1$ recovers the solution of the original system.
+
+A non-zero auxiliary parameter $\hbar$, known as the convergence-control parameter, is also introduced. It is not a parameter of the SEACLR model; rather, it controls the convergence of the resulting series solution. With the linear operator
+\begin{equation}
+	\mathcal{L}[\phi_i]=\frac{d\phi_i}{dt},
+\end{equation}
+the zero-order deformation equation is
+\begin{equation}
+	(1-q)\mathcal{L}[\phi_i-x_{i,0}]
+	=q\hbar N_i[\boldsymbol{\phi}],
+	\qquad
+	\phi_i(0;q)=x_i(0).
+	\label{eq:zeroth}
+\end{equation}
+Since $\dot{x}_{i,0}=0$, equation~\eqref{eq:zeroth} reduces to
+\begin{equation}
+	(1-q)\dot{\phi}_i(t;q)
+	=q\hbar N_i[\boldsymbol{\phi}(t;q)].
+	\label{eq:zeroth2}
+\end{equation}
+At $q=0$,
+\begin{equation}
+	\dot{\phi}_i(t;0)=0,
+\end{equation}
+and therefore
+\begin{equation}
+	\phi_i(t;0)=x_{i,0}(t).
+\end{equation}
+At $q=1$,
+\begin{equation}
+	0=\hbar N_i[\boldsymbol{\phi}(t;1)].
+\end{equation}
+Since $\hbar\neq0$,
+\begin{equation}
+	N_i[\boldsymbol{\phi}(t;1)]=0,
+\end{equation}
+which is the original SEACLR system. Thus,
+\begin{equation}
+	\phi_i(t;1)=x_i(t).
+\end{equation}
+The solution is subsequently developed by expanding $\phi_i(t;q)$ in a power series of $q$, from which the higher-order deformation equations and the approximate solution are obtained.
+
+\medskip
+\noindent\textbf{Series substitution in the left-hand side.}
+The function $\phi_i(t;q)$ is expressed as a power series in the embedding parameter $q$:
+\begin{equation}
+	\phi_i(t;q)=\sum_{m=0}^{\infty}x_{i,m}(t)q^m,
+	\qquad
+	\dot{\phi}_i(t;q)=\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m,
+	\qquad i\in\{S,E,A,C,L,R\}.
+	\label{eq:Maclaurin}
+\end{equation}
+The coefficient $x_{i,0}(t)$ is the initial approximation, while the higher-order terms $x_{i,1}(t),x_{i,2}(t),\ldots$ provide successive corrections to this approximation. Since $x_{i,0}(t)=x_i(0)$, its derivative is zero.
+
+Substituting the series for $\dot{\phi}_i(t;q)$ from equation~\eqref{eq:Maclaurin} into the left-hand side of equation~\eqref{eq:zeroth2} gives
+\begin{equation}
+	(1-q)\dot{\phi}_i(t;q)
+	=(1-q)\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m.
+\end{equation}
+
+Multiplying out the bracket $(1-q)$ against the series term by term,
+\begin{equation}
+	(1-q)\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m
+	=\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m
+	-\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^{m+1}.
+\end{equation}
+
+For the second sum, the index is shifted by setting $n=m+1$, so that $m=n-1$. As $m$ runs from $0$ to $\infty$, $n$ runs from $1$ to $\infty$, giving
+\begin{equation}
+	\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^{m+1}
+	=\sum_{n=1}^{\infty}\dot{x}_{i,n-1}(t)q^n.
+\end{equation}
+Since $n$ is only a summation label, it may be renamed back to $m$ without changing the value of the sum:
+\begin{equation}
+	\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^{m+1}
+	=\sum_{m=1}^{\infty}\dot{x}_{i,m-1}(t)q^m.
+\end{equation}
+
+Substituting this reindexed form back into the expansion of $(1-q)\dot{\phi}_i(t;q)$ gives
+\begin{equation}
+	(1-q)\dot{\phi}_i(t;q)
+	=\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m
+	-\sum_{m=1}^{\infty}\dot{x}_{i,m-1}(t)q^{m}.
+\end{equation}
+
+The first sum runs from $m=0$, while the second sum runs from $m=1$. To compare them term by term, the first sum is split off at its $m=0$ term, leaving the rest of it starting from $m=1$ as well:
+\begin{equation}
+	\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m
+	=\dot{x}_{i,0}(t)\,q^{0}+\sum_{m=1}^{\infty}\dot{x}_{i,m}(t)q^m.
+\end{equation}
+
+Since $q^0=1$, this is simply
+\begin{equation}
+	\sum_{m=0}^{\infty}\dot{x}_{i,m}(t)q^m
+	=\dot{x}_{i,0}(t)+\sum_{m=1}^{\infty}\dot{x}_{i,m}(t)q^m.
+\end{equation}
+
+Substituting this into the earlier expression,
+\begin{equation}
+	(1-q)\dot{\phi}_i(t;q)
+	=\dot{x}_{i,0}(t)+\sum_{m=1}^{\infty}\dot{x}_{i,m}(t)q^m
+	-\sum_{m=1}^{\infty}\dot{x}_{i,m-1}(t)q^{m}.
+\end{equation}
+
+Both remaining sums now start at the same index, $m=1$, and carry the same power $q^m$ at every step. The two sums may therefore be combined into a single sum, with the coefficients of $q^m$ subtracted at each $m$:
+\begin{equation}
+	(1-q)\dot{\phi}_i(t;q)
+	=\dot{x}_{i,0}(t)
+	+\sum_{m=1}^{\infty}
+	\left[\dot{x}_{i,m}(t)-\dot{x}_{i,m-1}(t)\right]q^m.
+	\label{eq:LHSexp}
+\end{equation}
+Because $\dot{x}_{i,0}(t)=0$, the $q^0$ term vanishes and the left-hand side starts at $q^1$. This holds for every compartment $i$.
+
+\medskip
+\noindent\textbf{Series substitution for $S(t)$.}
+The compartment $S(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	S(t)\;\to\;\sum_{k=0}^{\infty}x_{S,k}(t)q^k,
+\end{equation}
+and since $S$ is fed by $R$, the series $R(t)\to\sum_{k=0}^{\infty}x_{R,k}(t)q^k$ is used as well. The controls $u_1,u_2$ and all parameters carry no $q$, so they pass through the sums unchanged.
+
+Recall
+\begin{equation}
+	N_S = \dot S-\Lambda-\delta R+(\beta_1u_1+\mu)S.
+\end{equation}
+
+Each term of $N_S$ is replaced one at a time.
+
+\begin{equation}
+	\dot S \;\to\; \sum_{k=0}^{\infty}\dot{x}_{S,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\delta R \;\to\; \sum_{k=0}^{\infty}\delta\,x_{R,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\beta_1u_1+\mu)S \;\to\; \sum_{k=0}^{\infty}(\beta_1u_1+\mu)x_{S,k}(t)q^k.
+\end{equation}
+
+The term $\Lambda$ has no $q$ attached to it in $N_S$, so it only belongs to the $k=0$ term. This is written using the symbol $\mathbf{1}_{\{k=0\}}$, which equals $1$ when $k=0$ and $0$ for every other $k$:
+\begin{equation}
+	\Lambda \;\to\; \sum_{k=0}^{\infty}\Lambda\,\mathbf{1}_{\{k=0\}}q^k.
+\end{equation}
+
+Adding the four replaced terms together, $N_S$ becomes one single sum over $k$:
+\begin{equation}
+	N_S \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{S,k}(t) - \Lambda\,\mathbf{1}_{\{k=0\}} - \delta x_{R,k}(t) + (\beta_1u_1+\mu)x_{S,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{S,k}(t)$:
+\begin{equation}
+	\rho_{S,k}(t) = \dot{x}_{S,k}(t) - \Lambda\,\mathbf{1}_{\{k=0\}} - \delta x_{R,k}(t) + (\beta_1u_1+\mu)x_{S,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_S[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{S,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_S[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{S,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_S[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{S,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}. It has the same form, a sum over $q^m$ starting at $m=1$, as the left-hand side~\eqref{eq:LHSexp}. Two power series are equal only if the coefficient of $q^m$ matches on both sides, for every $m$. Matching them gives, for $m\geq1$,
+\begin{equation}
+	\dot{x}_{S,m}(t)-\dot{x}_{S,m-1}(t)=\hbar\rho_{S,m-1}(t).
+	\label{eq:S_first_deformation bf}
+\end{equation}
+At $m=1$, the deformation equation is
+\begin{equation}
+	\dot{x}_{S,1}(t)-\dot{x}_{S,0}(t)=\hbar\,\rho_{S,0}(t).
+	\label{eq:S_first_deformation}
+\end{equation}
+Since $x_{S,0}(t)=S(0)$, it follows that $\dot{x}_{S,0}(t)=0$. Equation~\eqref{eq:S_first_deformation} therefore reduces to
+\begin{equation}
+	\dot{x}_{S,1}(t)=\hbar\,\rho_{S,0}(t).
+	\label{eq:S_first_derivative}
+\end{equation}
+Integrating \eqref{eq:S_first_derivative} over $[0,t]$ gives
+\begin{equation}
+	x_{S,1}(t)-x_{S,1}(0)=\hbar\int_0^t\rho_{S,0}(\tau)\,d\tau.
+	\label{eq:S_first_integral}
+\end{equation}
+The initial condition $\phi_S(0;q)=S(0)$ for all $q$ implies $x_{S,m}(0)=0$ for every $m\geq1$. Hence, equation~\eqref{eq:S_first_integral} becomes
+\begin{equation}
+	x_{S,1}(t)=\hbar\int_0^t\rho_{S,0}(\tau)\,d\tau,
+	\label{eq:S_first_correction}
+\end{equation}
+where
+\begin{equation}
+	\rho_{S,0}(\tau)=-\Lambda-\delta R(0)+\bigl(\beta_1u_1(\tau)+\mu\bigr)S(0).
+	\label{eq:S_zero_residual}
+\end{equation}
+
+For $m\geq2$, the deformation equation takes the for( \ref{eq:S_first_deformation bf}) written as 
+\begin{equation}
+	\dot{x}_{S,m}(t)-\dot{x}_{S,m-1}(t)=\hbar\,\rho_{S,m-1}(t).
+	\label{eq:S_higher_deformation}
+\end{equation}
+Integrating \eqref{eq:S_higher_deformation} over $[0,t]$ w.r.t yields
+\begin{equation}
+	\begin{aligned}
+		x_{S,m}(t)-x_{S,m}(0)
+		&-x_{S,m-1}(t)+x_{S,m-1}(0)\\
+		&=\hbar\int_0^t\rho_{S,m-1}(\tau)\,d\tau.
+	\end{aligned}
+	\label{eq:S_higher_integral}
+\end{equation}
+Since $m\geq2$, both correction terms have zero initial values by the initial-condition result above. Thus,
+\begin{equation}
+	x_{S,m}(t)=x_{S,m-1}(t)+\hbar\int_0^t\rho_{S,m-1}(\tau)\,d\tau,
+	\quad m\geq2.
+	\label{eq:S_higher_correction}
+\end{equation}
+
+Equations~\eqref{eq:S_first_correction} and~\eqref{eq:S_higher_correction} differ only in the presence of the preceding correction $x_{S,m-1}(t)$. To combine them, define the indicator coefficient
+\begin{equation}
+	\chi_m=
+	\begin{cases}
+		0, & m=1,\\
+		1, & m\geq2.
+	\end{cases}
+	\label{eq:S_indicator}
+\end{equation}
+The unified recurrence is then
+\begin{equation}
+	x_{S,m}(t)=\chi_m\,x_{S,m-1}(t)+\hbar\int_0^t\rho_{S,m-1}(\tau)\,d\tau,
+	\quad m\geq1.
+	\label{eq:S_unified_recurrence}
+\end{equation}
+For $m=1$, $\chi_1=0$, and equation~\eqref{eq:S_unified_recurrence} reduces to equation~\eqref{eq:S_first_correction}. For $m\geq2$, $\chi_m=1$, and it reduces to equation~\eqref{eq:S_higher_correction}. Thus, $\chi_m$ is not a new solution term; it is an indicator that switches the preceding correction on or off. The residual $\rho_{S,m-1}$ is evaluated using the preceding-order components, including $x_{S,m-1}$ and $x_{R,m-1}$.
+
+\medskip
+\noindent\textbf{Series substitution for $E(t)$.}
+The compartment $E(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	E(t)\;\to\;\sum_{k=0}^{\infty}x_{E,k}(t)q^k,
+\end{equation}
+and since $E$ is fed by $S$, the series $S(t)\to\sum_{k=0}^{\infty}x_{S,k}(t)q^k$ is used as well. The control $u_1$ and the parameters carry no $q$.
+
+Recall
+\begin{equation}
+	N_E = \dot E-\beta_1u_1S+(\beta_2+\mu)E.
+\end{equation}
+
+Each term of $N_E$ is replaced one at a time.
+
+\begin{equation}
+	\dot E \;\to\; \sum_{k=0}^{\infty}\dot{x}_{E,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\beta_1u_1S \;\to\; \sum_{k=0}^{\infty}\beta_1u_1\,x_{S,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\beta_2+\mu)E \;\to\; \sum_{k=0}^{\infty}(\beta_2+\mu)\,x_{E,k}(t)q^k.
+\end{equation}
+
+No term of $N_E$ is a constant without a state attached, so no indicator $\mathbf{1}_{\{k=0\}}$ is needed.
+
+Adding the three replaced terms together, $N_E$ becomes one single sum over $k$:
+\begin{equation}
+	N_E \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{E,k}(t) - \beta_1u_1\,x_{S,k}(t) + (\beta_2+\mu)x_{E,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{E,k}(t)$:
+\begin{equation}
+	\rho_{E,k}(t) = \dot{x}_{E,k}(t) - \beta_1u_1\,x_{S,k}(t) + (\beta_2+\mu)x_{E,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_E[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{E,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_E[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{E,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_E[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{E,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}, and it has the same form as the left-hand side~\eqref{eq:LHSexp}. Matching the coefficients of $q^m$ for $m\geq1$ gives
+\begin{equation}
+	\dot{x}_{E,m}(t)-\dot{x}_{E,m-1}(t)=\hbar\rho_{E,m-1}(t).
+\end{equation}
+
+\textbf{At $m=1$.}
+\begin{equation}
+	\dot{x}_{E,1}(t)-\dot{x}_{E,0}(t)=\hbar\rho_{E,0}(t).
+\end{equation}
+Since $x_{E,0}(t)=E(0)$ does not change with $t$, $\dot{x}_{E,0}(t)=0$. So
+\begin{equation}
+	\dot{x}_{E,1}(t)=\hbar\rho_{E,0}(t).
+\end{equation}
+Integrating both sides from $0$ to $t$:
+\begin{equation}
+	x_{E,1}(t)-x_{E,1}(0)=\hbar\int_0^t\rho_{E,0}(\tau)\,d\tau.
+\end{equation}
+The condition $\phi_E(0;q)=E(0)$ must hold for every value of $q$, so every correction term is zero at $t=0$ and $x_{E,1}(0)=0$. Hence
+\begin{equation}
+	x_{E,1}(t)=\hbar\int_0^t\rho_{E,0}(\tau)\,d\tau,
+\end{equation}
+where
+\begin{equation}
+	\rho_{E,0}(\tau)=-\beta_1u_1(\tau)S(0)+(\beta_2+\mu)E(0).
+\end{equation}
+
+\textbf{At $m\geq2$.} The same integration is repeated:
+\begin{equation}
+	x_{E,m}(t)-x_{E,m}(0)-\Bigl[x_{E,m-1}(t)-x_{E,m-1}(0)\Bigr]=\hbar\int_0^t\rho_{E,m-1}(\tau)\,d\tau.
+\end{equation}
+By the same reasoning, $x_{E,m}(0)=0$ and $x_{E,m-1}(0)=0$. Both drop out, leaving
+\begin{equation}
+	x_{E,m}(t)=x_{E,m-1}(t)+\hbar\int_0^t\rho_{E,m-1}(\tau)\,d\tau.
+\end{equation}
+
+With the switch $\chi_m$ ($\chi_1=0$, $\chi_m=1$ for $m\geq2$), both cases are written as one formula:
+\begin{equation}
+	x_{E,m}(t)=\chi_m\,x_{E,m-1}(t)+\hbar\int_0^t\rho_{E,m-1}(\tau)\,d\tau .
+\end{equation}
+Here $\rho_{E,m-1}$ contains $x_{S,m-1}$ and $x_{E,m-1}$.
+
+\medskip
+\noindent\textbf{Series substitution for $A(t)$.}
+The compartment $A(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	A(t)\;\to\;\sum_{k=0}^{\infty}x_{A,k}(t)q^k,
+\end{equation}
+and since $A$ is fed by $E$, the series $E(t)\to\sum_{k=0}^{\infty}x_{E,k}(t)q^k$ is used as well. The control $u_2$ and the parameters carry no $q$.
+
+Recall
+\begin{equation}
+	N_A = \dot A-\beta_2E+(\beta_3u_2+\alpha+\mu)A.
+\end{equation}
+
+Each term of $N_A$ is replaced one at a time.
+
+\begin{equation}
+	\dot A \;\to\; \sum_{k=0}^{\infty}\dot{x}_{A,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\beta_2E \;\to\; \sum_{k=0}^{\infty}\beta_2\,x_{E,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\beta_3u_2+\alpha+\mu)A \;\to\; \sum_{k=0}^{\infty}(\beta_3u_2+\alpha+\mu)\,x_{A,k}(t)q^k.
+\end{equation}
+
+No constant source appears in $N_A$, so no indicator $\mathbf{1}_{\{k=0\}}$ is needed.
+
+Adding the three replaced terms together, $N_A$ becomes one single sum over $k$:
+\begin{equation}
+	N_A \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{A,k}(t) - \beta_2\,x_{E,k}(t) + (\beta_3u_2+\alpha+\mu)x_{A,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{A,k}(t)$:
+\begin{equation}
+	\rho_{A,k}(t) = \dot{x}_{A,k}(t) - \beta_2\,x_{E,k}(t) + (\beta_3u_2+\alpha+\mu)x_{A,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_A[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{A,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_A[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{A,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_A[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{A,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}, and it has the same form as the left-hand side~\eqref{eq:LHSexp}. Matching the coefficients of $q^m$ for $m\geq1$ gives
+\begin{equation}
+	\dot{x}_{A,m}(t)-\dot{x}_{A,m-1}(t)=\hbar\rho_{A,m-1}(t).
+\end{equation}
+
+\textbf{At $m=1$.}
+\begin{equation}
+	\dot{x}_{A,1}(t)-\dot{x}_{A,0}(t)=\hbar\rho_{A,0}(t).
+\end{equation}
+Since $x_{A,0}(t)=A(0)$ does not change with $t$, $\dot{x}_{A,0}(t)=0$. So
+\begin{equation}
+	\dot{x}_{A,1}(t)=\hbar\rho_{A,0}(t).
+\end{equation}
+Integrating both sides from $0$ to $t$:
+\begin{equation}
+	x_{A,1}(t)-x_{A,1}(0)=\hbar\int_0^t\rho_{A,0}(\tau)\,d\tau.
+\end{equation}
+The condition $\phi_A(0;q)=A(0)$ must hold for every value of $q$, so $x_{A,1}(0)=0$. Hence
+\begin{equation}
+	x_{A,1}(t)=\hbar\int_0^t\rho_{A,0}(\tau)\,d\tau,
+\end{equation}
+where
+\begin{equation}
+	\rho_{A,0}(\tau)=-\beta_2E(0)+(\beta_3u_2(\tau)+\alpha+\mu)A(0).
+\end{equation}
+
+\textbf{At $m\geq2$.} The same integration is repeated:
+\begin{equation}
+	x_{A,m}(t)-x_{A,m}(0)-\Bigl[x_{A,m-1}(t)-x_{A,m-1}(0)\Bigr]=\hbar\int_0^t\rho_{A,m-1}(\tau)\,d\tau.
+\end{equation}
+By the same reasoning, $x_{A,m}(0)=0$ and $x_{A,m-1}(0)=0$. Both drop out, leaving
+\begin{equation}
+	x_{A,m}(t)=x_{A,m-1}(t)+\hbar\int_0^t\rho_{A,m-1}(\tau)\,d\tau.
+\end{equation}
+
+With the switch $\chi_m$ ($\chi_1=0$, $\chi_m=1$ for $m\geq2$):
+\begin{equation}
+	x_{A,m}(t)=\chi_m\,x_{A,m-1}(t)+\hbar\int_0^t\rho_{A,m-1}(\tau)\,d\tau .
+\end{equation}
+Here $\rho_{A,m-1}$ contains $x_{E,m-1}$ and $x_{A,m-1}$.
+
+\medskip
+\noindent\textbf{Series substitution for $C(t)$.}
+The compartment $C(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	C(t)\;\to\;\sum_{k=0}^{\infty}x_{C,k}(t)q^k,
+\end{equation}
+and since $C$ is fed by $A$, the series $A(t)\to\sum_{k=0}^{\infty}x_{A,k}(t)q^k$ is used as well. The control $u_2$ and the parameters carry no $q$.
+
+Recall
+\begin{equation}
+	N_C = \dot C-(\beta_3u_2+\alpha)A+(\beta_4+\gamma+\mu)C.
+\end{equation}
+
+Each term of $N_C$ is replaced one at a time.
+
+\begin{equation}
+	\dot C \;\to\; \sum_{k=0}^{\infty}\dot{x}_{C,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\beta_3u_2+\alpha)A \;\to\; \sum_{k=0}^{\infty}(\beta_3u_2+\alpha)\,x_{A,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\beta_4+\gamma+\mu)C \;\to\; \sum_{k=0}^{\infty}(\beta_4+\gamma+\mu)\,x_{C,k}(t)q^k.
+\end{equation}
+
+No constant source appears in $N_C$, so no indicator $\mathbf{1}_{\{k=0\}}$ is needed.
+
+Adding the three replaced terms together, $N_C$ becomes one single sum over $k$:
+\begin{equation}
+	N_C \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{C,k}(t) - (\beta_3u_2+\alpha)x_{A,k}(t) + (\beta_4+\gamma+\mu)x_{C,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{C,k}(t)$:
+\begin{equation}
+	\rho_{C,k}(t) = \dot{x}_{C,k}(t) - (\beta_3u_2+\alpha)x_{A,k}(t) + (\beta_4+\gamma+\mu)x_{C,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_C[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{C,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_C[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{C,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_C[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{C,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}, and it has the same form as the left-hand side~\eqref{eq:LHSexp}. Matching the coefficients of $q^m$ for $m\geq1$ gives
+\begin{equation}
+	\dot{x}_{C,m}(t)-\dot{x}_{C,m-1}(t)=\hbar\rho_{C,m-1}(t).
+\end{equation}
+
+\textbf{At $m=1$.}
+\begin{equation}
+	\dot{x}_{C,1}(t)-\dot{x}_{C,0}(t)=\hbar\rho_{C,0}(t).
+\end{equation}
+Since $x_{C,0}(t)=C(0)$ does not change with $t$, $\dot{x}_{C,0}(t)=0$. So
+\begin{equation}
+	\dot{x}_{C,1}(t)=\hbar\rho_{C,0}(t).
+\end{equation}
+Integrating both sides from $0$ to $t$:
+\begin{equation}
+	x_{C,1}(t)-x_{C,1}(0)=\hbar\int_0^t\rho_{C,0}(\tau)\,d\tau.
+\end{equation}
+The condition $\phi_C(0;q)=C(0)$ must hold for every value of $q$, so $x_{C,1}(0)=0$. Hence
+\begin{equation}
+	x_{C,1}(t)=\hbar\int_0^t\rho_{C,0}(\tau)\,d\tau,
+\end{equation}
+where
+\begin{equation}
+	\rho_{C,0}(\tau)=-(\beta_3u_2(\tau)+\alpha)A(0)+(\beta_4+\gamma+\mu)C(0).
+\end{equation}
+
+\textbf{At $m\geq2$.} The same integration is repeated:
+\begin{equation}
+	x_{C,m}(t)-x_{C,m}(0)-\Bigl[x_{C,m-1}(t)-x_{C,m-1}(0)\Bigr]=\hbar\int_0^t\rho_{C,m-1}(\tau)\,d\tau.
+\end{equation}
+By the same reasoning, $x_{C,m}(0)=0$ and $x_{C,m-1}(0)=0$. Both drop out, leaving
+\begin{equation}
+	x_{C,m}(t)=x_{C,m-1}(t)+\hbar\int_0^t\rho_{C,m-1}(\tau)\,d\tau.
+\end{equation}
+
+With the switch $\chi_m$ ($\chi_1=0$, $\chi_m=1$ for $m\geq2$):
+\begin{equation}
+	x_{C,m}(t)=\chi_m\,x_{C,m-1}(t)+\hbar\int_0^t\rho_{C,m-1}(\tau)\,d\tau .
+\end{equation}
+Here $\rho_{C,m-1}$ contains $x_{A,m-1}$ and $x_{C,m-1}$.
+
+\medskip
+\noindent\textbf{Series substitution for $L(t)$.}
+The compartment $L(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	L(t)\;\to\;\sum_{k=0}^{\infty}x_{L,k}(t)q^k,
+\end{equation}
+and since $L$ is fed by $C$, the series $C(t)\to\sum_{k=0}^{\infty}x_{C,k}(t)q^k$ is used as well. The parameters carry no $q$.
+
+Recall
+\begin{equation}
+	N_L = \dot L-\beta_4C+\mu L.
+\end{equation}
+
+Each term of $N_L$ is replaced one at a time.
+
+\begin{equation}
+	\dot L \;\to\; \sum_{k=0}^{\infty}\dot{x}_{L,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\beta_4C \;\to\; \sum_{k=0}^{\infty}\beta_4\,x_{C,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\mu L \;\to\; \sum_{k=0}^{\infty}\mu\,x_{L,k}(t)q^k.
+\end{equation}
+
+No constant source appears in $N_L$, so no indicator $\mathbf{1}_{\{k=0\}}$ is needed.
+
+Adding the three replaced terms together, $N_L$ becomes one single sum over $k$:
+\begin{equation}
+	N_L \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{L,k}(t) - \beta_4\,x_{C,k}(t) + \mu\,x_{L,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{L,k}(t)$:
+\begin{equation}
+	\rho_{L,k}(t) = \dot{x}_{L,k}(t) - \beta_4\,x_{C,k}(t) + \mu\,x_{L,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_L[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{L,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_L[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{L,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_L[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{L,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}, and it has the same form as the left-hand side~\eqref{eq:LHSexp}. Matching the coefficients of $q^m$ for $m\geq1$ gives
+\begin{equation}
+	\dot{x}_{L,m}(t)-\dot{x}_{L,m-1}(t)=\hbar\rho_{L,m-1}(t).
+\end{equation}
+
+\textbf{At $m=1$.}
+\begin{equation}
+	\dot{x}_{L,1}(t)-\dot{x}_{L,0}(t)=\hbar\rho_{L,0}(t).
+\end{equation}
+Since $x_{L,0}(t)=L(0)$ does not change with $t$, $\dot{x}_{L,0}(t)=0$. So
+\begin{equation}
+	\dot{x}_{L,1}(t)=\hbar\rho_{L,0}(t).
+\end{equation}
+Integrating both sides from $0$ to $t$:
+\begin{equation}
+	x_{L,1}(t)-x_{L,1}(0)=\hbar\int_0^t\rho_{L,0}(\tau)\,d\tau.
+\end{equation}
+The condition $\phi_L(0;q)=L(0)$ must hold for every value of $q$, so $x_{L,1}(0)=0$. Hence
+\begin{equation}
+	x_{L,1}(t)=\hbar\int_0^t\rho_{L,0}(\tau)\,d\tau,
+\end{equation}
+where
+\begin{equation}
+	\rho_{L,0}=-\beta_4C(0)+\mu L(0).
+\end{equation}
+This does not depend on $t$, so $x_{L,1}(t)=\hbar\,\rho_{L,0}\,t$.
+
+\textbf{At $m\geq2$.} The same integration is repeated:
+\begin{equation}
+	x_{L,m}(t)-x_{L,m}(0)-\Bigl[x_{L,m-1}(t)-x_{L,m-1}(0)\Bigr]=\hbar\int_0^t\rho_{L,m-1}(\tau)\,d\tau.
+\end{equation}
+By the same reasoning, $x_{L,m}(0)=0$ and $x_{L,m-1}(0)=0$. Both drop out, leaving
+\begin{equation}
+	x_{L,m}(t)=x_{L,m-1}(t)+\hbar\int_0^t\rho_{L,m-1}(\tau)\,d\tau.
+\end{equation}
+
+With the switch $\chi_m$ ($\chi_1=0$, $\chi_m=1$ for $m\geq2$):
+\begin{equation}
+	x_{L,m}(t)=\chi_m\,x_{L,m-1}(t)+\hbar\int_0^t\rho_{L,m-1}(\tau)\,d\tau .
+\end{equation}
+Here $\rho_{L,m-1}$ contains $x_{C,m-1}$ and $x_{L,m-1}$.
+
+\medskip
+\noindent\textbf{Series substitution for $R(t)$.}
+The compartment $R(t)$ in System~\eqref{eq:model1} is replaced by its full power series,
+\begin{equation}
+	R(t)\;\to\;\sum_{k=0}^{\infty}x_{R,k}(t)q^k,
+\end{equation}
+and since $R$ is fed by $C$, the series $C(t)\to\sum_{k=0}^{\infty}x_{C,k}(t)q^k$ is used as well. The parameters carry no $q$.
+
+Recall
+\begin{equation}
+	N_R = \dot R-\gamma C+(\delta+\mu)R.
+\end{equation}
+
+Each term of $N_R$ is replaced one at a time.
+
+\begin{equation}
+	\dot R \;\to\; \sum_{k=0}^{\infty}\dot{x}_{R,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	\gamma C \;\to\; \sum_{k=0}^{\infty}\gamma\,x_{C,k}(t)q^k.
+\end{equation}
+
+\begin{equation}
+	(\delta+\mu)R \;\to\; \sum_{k=0}^{\infty}(\delta+\mu)\,x_{R,k}(t)q^k.
+\end{equation}
+
+No constant source appears in $N_R$, so no indicator $\mathbf{1}_{\{k=0\}}$ is needed.
+
+Adding the three replaced terms together, $N_R$ becomes one single sum over $k$:
+\begin{equation}
+	N_R \;\to\; \sum_{k=0}^{\infty}
+	\Bigl[\dot{x}_{R,k}(t) - \gamma\,x_{C,k}(t) + (\delta+\mu)x_{R,k}(t)\Bigr]q^k.
+\end{equation}
+
+The bracket above is given a short name, $\rho_{R,k}(t)$:
+\begin{equation}
+	\rho_{R,k}(t) = \dot{x}_{R,k}(t) - \gamma\,x_{C,k}(t) + (\delta+\mu)x_{R,k}(t).
+\end{equation}
+
+So
+\begin{equation}
+	N_R[\boldsymbol{\phi}(t;q)]=\sum_{k=0}^{\infty}\rho_{R,k}(t)q^k .
+\end{equation}
+
+Multiplying both sides by $q\hbar$:
+\begin{equation}
+	q\hbar N_R[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{k=0}^{\infty}\rho_{R,k}(t)q^{k+1}.
+\end{equation}
+
+Set $m=k+1$, so $k=m-1$. As $k$ goes from $0$ to $\infty$, $m$ goes from $1$ to $\infty$:
+\begin{equation}
+	q\hbar N_R[\boldsymbol{\phi}(t;q)]
+	=\hbar\sum_{m=1}^{\infty}\rho_{R,m-1}(t)q^m.
+\end{equation}
+
+This is the right-hand side of equation~\eqref{eq:zeroth2}, and it has the same form as the left-hand side~\eqref{eq:LHSexp}. Matching the coefficients of $q^m$ for $m\geq1$ gives
+\begin{equation}
+	\dot{x}_{R,m}(t)-\dot{x}_{R,m-1}(t)=\hbar\rho_{R,m-1}(t).
+\end{equation}
+
+\textbf{At $m=1$.}
+\begin{equation}
+	\dot{x}_{R,1}(t)-\dot{x}_{R,0}(t)=\hbar\rho_{R,0}(t).
+\end{equation}
+Since $x_{R,0}(t)=R(0)$ does not change with $t$, $\dot{x}_{R,0}(t)=0$. So
+\begin{equation}
+	\dot{x}_{R,1}(t)=\hbar\rho_{R,0}(t).
+\end{equation}
+Integrating both sides from $0$ to $t$:
+\begin{equation}
+	x_{R,1}(t)-x_{R,1}(0)=\hbar\int_0^t\rho_{R,0}(\tau)\,d\tau.
+\end{equation}
+The condition $\phi_R(0;q)=R(0)$ must hold for every value of $q$, so $x_{R,1}(0)=0$. Hence
+\begin{equation}
+	x_{R,1}(t)=\hbar\int_0^t\rho_{R,0}(\tau)\,d\tau,
+\end{equation}
+where
+\begin{equation}
+	\rho_{R,0}=-\gamma C(0)+(\delta+\mu)R(0).
+\end{equation}
+This does not depend on $t$, so $x_{R,1}(t)=\hbar\,\rho_{R,0}\,t$.
+
+\textbf{At $m\geq2$.} The same integration is repeated:
+\begin{equation}
+	x_{R,m}(t)-x_{R,m}(0)-\Bigl[x_{R,m-1}(t)-x_{R,m-1}(0)\Bigr]=\hbar\int_0^t\rho_{R,m-1}(\tau)\,d\tau.
+\end{equation}
+By the same reasoning, $x_{R,m}(0)=0$ and $x_{R,m-1}(0)=0$. Both drop out, leaving
+\begin{equation}
+	x_{R,m}(t)=x_{R,m-1}(t)+\hbar\int_0^t\rho_{R,m-1}(\tau)\,d\tau.
+\end{equation}
+
+With the switch $\chi_m$ ($\chi_1=0$, $\chi_m=1$ for $m\geq2$):
+\begin{equation}
+	x_{R,m}(t)=\chi_m\,x_{R,m-1}(t)+\hbar\int_0^t\rho_{R,m-1}(\tau)\,d\tau .
+\end{equation}
+Here $\rho_{R,m-1}$ contains $x_{C,m-1}$ and $x_{R,m-1}$.
+
+\medskip
+\noindent\textbf{Recurrence solution.}
+The six residuals are
+\begin{align}
+	\rho_{S,k} &=
+	\dot{x}_{S,k}-\Lambda\,\mathbf{1}_{\{k=0\}}
+	-\delta x_{R,k}
+	+(\beta_1u_1+\mu)x_{S,k}, \nonumber\\
+	\rho_{E,k} &=
+	\dot{x}_{E,k}-\beta_1u_1x_{S,k}
+	+(\beta_2+\mu)x_{E,k}, \nonumber\\
+	\rho_{A,k} &=
+	\dot{x}_{A,k}-\beta_2x_{E,k}
+	+(\beta_3u_2+\alpha+\mu)x_{A,k}, \nonumber\\
+	\rho_{C,k} &=
+	\dot{x}_{C,k}-(\beta_3u_2+\alpha)x_{A,k}
+	+(\beta_4+\gamma+\mu)x_{C,k}, \nonumber\\
+	\rho_{L,k} &=
+	\dot{x}_{L,k}-\beta_4x_{C,k}+\mu x_{L,k}, \nonumber\\
+	\rho_{R,k} &=
+	\dot{x}_{R,k}-\gamma x_{C,k}
+	+(\delta+\mu)x_{R,k}.
+	\label{eq:rhodefs}
+\end{align}
+For all six compartments $i\in\{S,E,A,C,L,R\}$, the recurrence is
+\begin{equation}
+	x_{i,m}(t)
+	=\chi_m\,x_{i,m-1}(t)
+	+\hbar\int_0^t\rho_{i,m-1}(\tau)\,d\tau,
+	\quad m\geq1,
+	\label{eq:recursion}
+\end{equation}
+with $x_{i,0}(t)=x_i(0)$, $\chi_1=0$ and $\chi_m=1$ for $m\geq2$.
+
+Thus, the residuals recover the total-population balance
+$\dot{N}=\Lambda-\mu N$ order by order.
+
+\noindent\textbf{Note.} The residual $\rho_{i,m-1}$ is the error left in compartment $i$ after the corrections up to order $m-1$ are substituted. It drives each new correction and carries no $\hbar$ of its own, since $\hbar$ only multiplies it in~\eqref{eq:recursion}.
+
+
+\subsubsection{Convergence of the HAM Series}
+\label{sec:convergence}
+
+This subsection proves that the HAM series converges for $\hbar=-1$, by showing that its partial sums are the Picard iterates of the system.
+
+In addition to the HAM symbols of Table~\ref{tab:ham_notation}, the convergence proof uses the quantities listed in Table~\ref{tab:conv_notation}. They are introduced to write the system in vector form and to compare the HAM partial sums with the Picard iteration.
+
+\begin{longtable}{@{}p{2.8cm}p{10.4cm}@{}}
+	\caption{Additional notation used in the convergence proof}
+	\label{tab:conv_notation}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{2}{l}{\small\textit{Table~\ref{tab:conv_notation} continued}}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Description} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$\mathbf{x}(t)$ & Vector of the six compartments, $(S,E,A,C,L,R)^{\top}$ \\[4pt]
+	$\mathcal{F}(t,\mathbf{x})$ & Right-hand side of the system in vector form, so that $\dot{\mathbf{x}}=\mathcal{F}(t,\mathbf{x})$ \\[4pt]
+	$J(t)$ & Matrix of the coefficients of $S,E,A,C,L,R$ in the six equations. It depends on $t$ through $u_1(t)$ and $u_2(t)$, and is bounded on $[0,T]$ \\[4pt]
+	$\mathbf{b}$ & Constant vector $(\Lambda,0,0,0,0,0)^{\top}$ \\[4pt]
+	$\boldsymbol{\rho}_k(t)$ & Vector of the six $k$-th order residuals $\rho_{S,k},\dots,\rho_{R,k}$ \\[4pt]
+	$\mathbf{\Phi}_M(t)$ & Partial sum $\mathbf{x}_0+\mathbf{x}_1+\cdots+\mathbf{x}_M$ of the HAM series, called the $M$-th order approximation \\[4pt]
+	Picard iterate & Sequence defined by $\mathbf{\Phi}_M=\mathbf{x}(0)+\int_0^t\mathcal{F}(\tau,\mathbf{\Phi}_{M-1})\,d\tau$ \\[4pt]
+	$T$ & Fixed but arbitrary final time of the interval $[0,T]$ \\
+\end{longtable}
+
+
+
+
+\begin{theorem}[Convergence of the HAM Series]
+	\label{thm:HAM_convergence}
+	Let $\hbar=-1$ in the recurrence~\eqref{eq:recursion}. Then, for every $T>0$, the series $\sum_{m=0}^{\infty}\mathbf{x}_m(t)$ of equation~\eqref{eq:Maclaurin} at $q=1$ converges on $[0,T]$ to the unique solution of System~\eqref{eq:model1}--\eqref{eq:ic1}.
+\end{theorem}
+
+\begin{proof}
+	System~\eqref{eq:model1} is written as
+	$\dot{\mathbf{x}}=\mathcal{F}(t,\mathbf{x})=J(t)\mathbf{x}+\mathbf{b}$,
+	where $J(t)$ and $\mathbf{b}$ are as in Table~\ref{tab:conv_notation}.
+	Integrating both sides from $0$ to $t$ gives
+	\begin{equation}
+		\int_0^t\dot{\mathbf{x}}(\tau)\,d\tau
+		=\int_0^t\mathcal{F}\bigl(\tau,\mathbf{x}(\tau)\bigr)\,d\tau.
+	\end{equation}
+	Using the initial condition, this becomes
+	\begin{equation}
+		\mathbf{x}(t)=\mathbf{x}(0)
+		+\int_0^t\mathcal{F}\bigl(\tau,\mathbf{x}(\tau)\bigr)\,d\tau.
+		\label{eq:integralform}
+	\end{equation}
+	
+	Let $\mathbf{\Phi}_M(t)$ denote the sum of the first $M+1$ terms of the HAM series,
+	\begin{equation}
+		\mathbf{\Phi}_M(t)=\mathbf{x}_0(t)+\mathbf{x}_1(t)+\cdots+\mathbf{x}_M(t),
+	\end{equation}
+	where $\mathbf{\Phi}_0(t)=\mathbf{x}_0(t)=\mathbf{x}(0)$.
+	
+	From equation~\eqref{eq:recursion},
+	$\mathbf{x}_1(t)=\hbar\int_0^t\boldsymbol{\rho}_0(\tau)\,d\tau$,
+	where $\boldsymbol{\rho}_0=\dot{\mathbf{x}}_0-J\mathbf{x}_0-\mathbf{b}$
+	and $\dot{\mathbf{x}}_0=\mathbf{0}$. Hence,
+	$\boldsymbol{\rho}_0=-J\mathbf{x}_0-\mathbf{b}$, and setting $\hbar=-1$ gives
+	\begin{equation}
+		\mathbf{x}_1(t)
+		=-\int_0^t\boldsymbol{\rho}_0(\tau)\,d\tau
+		=\int_0^t\bigl[J(\tau)\mathbf{x}_0+\mathbf{b}\bigr]d\tau.
+	\end{equation}
+	Since $\mathcal{F}(\tau,\mathbf{y})=J(\tau)\mathbf{y}+\mathbf{b}$
+	and $\mathbf{x}_0=\mathbf{\Phi}_0$, we obtain
+	\begin{equation}
+		\mathbf{x}_1(t)
+		=\int_0^t\mathcal{F}\bigl(\tau,\mathbf{\Phi}_0(\tau)\bigr)\,d\tau.
+		\label{eq:x1form}
+	\end{equation}
+	
+	For $m\geq2$, equation~\eqref{eq:recursion} gives
+	\begin{equation}
+		\mathbf{x}_m(t)
+		=\mathbf{x}_{m-1}(t)
+		-\int_0^t\bigl[\dot{\mathbf{x}}_{m-1}(\tau)
+		-J(\tau)\mathbf{x}_{m-1}(\tau)\bigr]d\tau.
+	\end{equation}
+	Separating the integrals and applying the fundamental theorem of calculus yields
+	\begin{equation}
+		\mathbf{x}_m(t)
+		=\mathbf{x}_{m-1}(0)
+		+\int_0^tJ(\tau)\mathbf{x}_{m-1}(\tau)\,d\tau.
+	\end{equation}
+	The recurrence~\eqref{eq:recursion} gives
+	$\mathbf{x}_{m-1}(0)=\mathbf{0}$ for $m\geq2$. Therefore,
+	\begin{equation}
+		\mathbf{x}_m(t)
+		=\int_0^tJ(\tau)\mathbf{x}_{m-1}(\tau)\,d\tau.
+		\label{eq:xm_interim}
+	\end{equation}
+	
+	By the definition of $\mathbf{\Phi}_M$,
+	$\mathbf{x}_{m-1}=\mathbf{\Phi}_{m-1}-\mathbf{\Phi}_{m-2}$
+	for $m\geq2$. Substitution into equation~\eqref{eq:xm_interim} gives
+	\begin{equation}
+		\mathbf{x}_m(t)
+		=\int_0^tJ(\tau)
+		\bigl[\mathbf{\Phi}_{m-1}(\tau)-\mathbf{\Phi}_{m-2}(\tau)\bigr]d\tau.
+	\end{equation}
+	Adding and subtracting $\mathbf{b}$ inside the integrand and using the definition of $\mathcal{F}$, we obtain
+	\begin{equation}
+		\mathbf{x}_m(t)
+		=\int_0^t\Bigl[
+		\mathcal{F}\bigl(\tau,\mathbf{\Phi}_{m-1}(\tau)\bigr)
+		-\mathcal{F}\bigl(\tau,\mathbf{\Phi}_{m-2}(\tau)\bigr)
+		\Bigr]d\tau,\qquad m\geq2.
+		\label{eq:xmform}
+	\end{equation}
+	
+	Using equations~\eqref{eq:x1form} and~\eqref{eq:xmform}, the partial sum
+	$\mathbf{\Phi}_M=\sum_{m=0}^{M}\mathbf{x}_m$ can be written as
+	\begin{align}
+		\mathbf{\Phi}_M(t)
+		&=\mathbf{x}(0)
+		+\int_0^t\mathcal{F}\bigl(\tau,\mathbf{\Phi}_0(\tau)\bigr)d\tau
+		\nonumber\\
+		&\quad+\sum_{m=2}^{M}\int_0^t
+		\Bigl[
+		\mathcal{F}\bigl(\tau,\mathbf{\Phi}_{m-1}(\tau)\bigr)
+		-\mathcal{F}\bigl(\tau,\mathbf{\Phi}_{m-2}(\tau)\bigr)
+		\Bigr]d\tau.
+	\end{align}
+	The integrals cancel consecutively, leaving
+	\begin{equation}
+		\mathbf{\Phi}_M(t)
+		=\mathbf{x}(0)
+		+\int_0^t\mathcal{F}\bigl(\tau,\mathbf{\Phi}_{M-1}(\tau)\bigr)\,d\tau,
+		\qquad M\geq1.
+		\label{eq:HAM_picard}
+	\end{equation}
+	
+	Equation~\eqref{eq:HAM_picard} is the Picard iteration associated with the integral equation~\eqref{eq:integralform}. Since $\mathcal{F}(t,\mathbf{x})=J(t)\mathbf{x}+\mathbf{b}$ is linear in $\mathbf{x}$ and $J(t)$ is bounded on every finite interval $[0,T]$, the Picard iterates converge uniformly on $[0,T]$ to the unique solution of System~\eqref{eq:model1}--\eqref{eq:ic1} \citep{coddington1955}. Consequently,
+	$\mathbf{\Phi}_M(t)\to\mathbf{x}(t)$ uniformly on $[0,T]$ as $M\to\infty$. Thus, the HAM series at $q=1$ converges to the stated solution.
+\end{proof}
+
+
+
+\begin{remark}
+	The Homotopy Perturbation Method (HPM) is the recurrence~\eqref{eq:recursion} with $\hbar=-1$ fixed, so HPM is HAM at one value of $\hbar$. For the present affine model, $\hbar=-1$ already converges, so HAM and HPM give the same series. HAM is retained because the freedom in $\hbar$ becomes necessary when later models are nonlinear.
+\end{remark}
+
+\section{Numerical Simulation}
+
+\subsection{Parameterisation and Reference Solution}
+\label{sec:params}
+
+The simulation covers the first 10 weeks of a campaign with constant reach and retargeting, $\bar u_1=0.70$ and $\bar u_2=0.60$. All rates are per week. Group sizes use one common unit and are read as relative sizes, not head counts. The campaign starts with $10.00$ unaware, $1.00$ exposed and $0.50$ engaged consumers, and with no consumer in the later stages. Table~\ref{tab:params_m1} gives the values and sources.
+
+\begin{longtable}{@{}p{1.6cm}p{7.2cm}p{1.3cm}p{2.9cm}@{}}
+	\caption{Parameter values (all rates per week).}
+	\label{tab:params_m1}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Meaning} & \textbf{Value} & \textbf{Source} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{4}{l}{\small\textit{Table~\ref{tab:params_m1} continued}}\\
+	\toprule
+	\textbf{Symbol} & \textbf{Meaning} & \textbf{Value} & \textbf{Source} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$\Lambda$ & Consumers entering the target audience & $0.50$ & \citet{gordon2019} \\[3pt]
+	$\mu$ & Fraction of each group leaving the market & $0.10$ & \citet{gordon2019} \\[3pt]
+	$\beta_1$ & Exposure coefficient, $S\to E$ & $0.68$ & \citet{gordon2019} \\[3pt]
+	$\beta_2$ & Engagement rate, $E\to A$ & $0.30$ & \citet{bleier2015} \\[3pt]
+	$\beta_3$ & Retargeting conversion coefficient, $A\to C$ & $0.52$ & \citet{sahni2019} \\[3pt]
+	$\alpha$ & Organic conversion rate, $A\to C$ & $0.15$ & \citet{lambrecht2013} \\[3pt]
+	$\beta_4$ & Loyalty transition rate, $C\to L$ & $0.20$ & \citet{fader2010} \\[3pt]
+	$\gamma$ & Churn rate, $C\to R$ & $0.10$ & \citet{fader2007} \\[3pt]
+	$\delta$ & Re-entry rate, $R\to S$ & $0.05$ & \citet{fader2007} \\[3pt]
+	$\bar u_1$ & Constant level of reach advertising & $0.70$ & \citet{gordon2019} \\[3pt]
+	$\bar u_2$ & Constant level of retargeting & $0.60$ & \citet{sahni2019} \\[3pt]
+	$S(0)$ & Unaware consumers at launch & $10.00$ & Initial condition \\[3pt]
+	$E(0)$ & Exposed consumers at launch & $1.00$ & Initial condition \\[3pt]
+	$A(0)$ & Engaged consumers at launch & $0.50$ & Initial condition \\[3pt]
+	$C(0),L(0),R(0)$ & Converted, loyal and re-entered at launch & $0.00$ & Initial condition \\
+\end{longtable}
+
+The sources differ in platform and measure, so the values give plausible magnitudes, not estimates for one platform. Ignoring market exit, consumers wait about $2.1$ weeks for exposure, $3.3$ to engage and $2.2$ to buy.
+
+The reference solution was computed in Python \texttt{3.x} with \texttt{scipy.integrate.odeint}, which uses LSODA (Livermore Solver for Ordinary Differential equations with Automatic method switching), at tolerances of $10^{-12}$. It switches between non-stiff and stiff methods as needed. HAM and HPM terms used high-precision arithmetic.
+
+\subsection{Selection of the Convergence-Control Parameter}
+
+With constant controls, every correction $\mathbf{x}_m(t)$ is a polynomial in $t$. At $m=1$, equation~\eqref{eq:S_first_deformation} gives
+\begin{equation}
+	x_{S,1}(t)=\hbar\,\rho_{S,0}\,t,\quad
+	\rho_{S,0}=5.26,
+	\qquad
+	x_{E,1}(t)=\hbar\,\rho_{E,0}\,t,\quad
+	\rho_{E,0}=-4.36 .
+\end{equation}
+These are the first corrections to the unaware ($S$) and exposed ($E$) groups. The term $\rho$ is each group's net weekly loss at launch, losses minus gains. At $\hbar=-1$ the unaware group falls by $5.26$ per week and the exposed group rises by $4.36$. Higher corrections depend on $\hbar$, a tuning setting with no marketing meaning, which is chosen from an $\hbar$-curve.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\textwidth]{figures/fig1_hbar_curve.png}
+	\caption{Choice of the convergence-control parameter $\hbar$: largest error of the HAM series over 10 weeks for 10, 15 and 20 terms. The green band marks the best region and the star marks the value $\hbar=-0.8$ used for HAM. The dot marks the standard HPM value $\hbar=-1$.}
+	\label{fig:hbar_curve}
+\end{figure}
+
+Figure~\ref{fig:hbar_curve} plots the largest error over the first 10 weeks against $\hbar$, for series of 10, 15 and 20 terms. Each curve has a flat low region between about $\hbar=-0.9$ and $\hbar=-0.7$, and in this region the error of the 20-term series is below $4\times10^{-7}$. The lowest point moves to the left as terms are added: it lies near $\hbar=-0.72$ for 10 terms, near $-0.84$ for 15 terms and near $-0.86$ for 20 terms.
+
+The standard HPM setting $\hbar=-1$ lies on the steep side of the curves. At 20 terms its error is about $3\times10^{-2}$, against about $1\times10^{-8}$ at the lowest point, a difference of more than six orders of magnitude. To the left of $\hbar=-1$ the error grows rapidly. The error reaches the size of the whole audience ($11.5$ consumers) near $\hbar=-0.9$ for 10 terms, near $\hbar=-1$ for 15 terms and near $\hbar=-1.1$ for 20 terms, and beyond these points the series is unusable. To the right of the best region the error rises slowly, so the choice is less critical on that side.
+
+The value $\hbar=-0.8$ lies in the low region for all three curves and is used for HAM, with an error of about $4\times10^{-8}$ at 20 terms. At this value the first-order corrections become $x_{S,1}=-4.21\,t$ and $x_{E,1}=3.49\,t$.
+
+In summary, the first-order corrections show that, immediately after launch, the susceptible compartment $S$ depletes at the rate $\hbar\rho_{S,0}$ while the exposed compartment $E$ accumulates at the rate $\hbar\rho_{E,0}$. The convergence-control parameter $\hbar=-0.8$, selected from the $\hbar$-curves, yields a 20-term approximation accurate to $O(10^{-8})$, whereas the HPM value $\hbar=-1$ gives only $O(10^{-2})$ at the same number of terms.
+
+\subsection{Results}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/fig2_trajectories.png}
+	\caption{Order $M=15$ HAM ($\hbar=-0.8$) and HPM ($\hbar=-1$) approximations of the six compartments against the exact solution. The shaded region marks the weeks after HPM departs from the exact solution; the vertical axes are clipped to the range of the exact solution.}
+	\label{fig:trajectories}
+\end{figure}
+
+Figure~\ref{fig:trajectories} shows that HAM lies on the exact solution in every compartment for the whole 10 weeks. The unaware group falls from $10$ to $0.95$, so most of the audience is reached within a few weeks. The exposed, engaged and converted groups peak about two weeks apart, at weeks $2.1$, $4.0$ and $6.6$, so consumers move through the journey as a wave. HPM follows the exact solution until about week $7$, which is the start of the shaded region. After that it drifts away, and the loyal and re-entered groups turn negative, which is impossible in the model.
+
+\begin{longtable}{@{}p{3.2cm}p{2.6cm}p{2.6cm}p{2.0cm}p{2.0cm}@{}}
+	\caption{Exact values at week 10 with peak size and timing.}
+	\label{tab:values_t10}\\
+	\toprule
+	\textbf{Compartment} & \textbf{Value at week 10} & \textbf{Share of audience} & \textbf{Peak size} & \textbf{Week of peak} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{5}{l}{\small\textit{Table~\ref{tab:values_t10} continued}}\\
+	\toprule
+	\textbf{Compartment} & \textbf{Value at week 10} & \textbf{Share of audience} & \textbf{Peak size} & \textbf{Week of peak} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	Susceptible $S$ & $0.952263$ & $12.9\%$ & $10.00$ & Launch \\[3pt]
+	Exposed $E$ & $1.452097$ & $19.6\%$ & $4.31$ & $2.1$ \\[3pt]
+	Aware/Engaged $A$ & $0.988244$ & $13.4\%$ & $1.90$ & $4.0$ \\[3pt]
+	Converted $C$ & $1.478776$ & $20.0\%$ & $1.80$ & $6.6$ \\[3pt]
+	Loyal $L$ & $1.768486$ & $23.9\%$ & Not reached & After $10$ \\[3pt]
+	Re-entered $R$ & $0.751349$ & $10.2\%$ & Not reached & After $10$ \\
+\end{longtable}
+
+Table~\ref{tab:values_t10} gives the state of the audience at week 10. The loyal group is the largest at $23.9\%$ and is still rising, since its inflow ($0.30$) exceeds its outflow ($0.18$). The converted group falls after week $6.6$ because it counts consumers now in the purchase stage, not purchases made so far, so the fall does not mean that sales have stopped. The audience falls from $11.5$ to $7.39$ because exits exceed recruitment, and it tends to $\Lambda/\mu=5$.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/fig3_error_vs_time.png}
+	\caption{Largest error against time for HAM ($\hbar=-0.8$) and HPM ($\hbar=-1$) with 4, 8, 12, 16 and 20 terms. The dashed line marks the size of the whole audience and the solid line marks the accuracy limit of the reference solution.}
+	\label{fig:error_time}
+\end{figure}
+
+Figure~\ref{fig:error_time} shows that the error is smallest at launch and grows with time, so a truncated series is most reliable in the first weeks. Adding terms lowers the error and delays its growth. With 20 terms, HPM stays at the accuracy limit of the reference solution until about week $3.5$ and reaches $3\times10^{-2}$ by week 10, which is $0.4\%$ to $2.0\%$ of the compartment values. With the same 20 terms, the HAM error never exceeds $4\times10^{-8}$. At week 10 the HPM error with 8 terms is larger than with 4 terms, so a short series can be worse than a shorter one before further terms bring it down.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/fig4_error_vs_order.png}
+	\caption{Largest error over 10 weeks against the number of terms for HAM ($\hbar=-0.8$ and $\hbar=-0.9$) and HPM ($\hbar=-1$) (left), and the number of terms each needs for an error below $10^{-6}$ (right). Squares mark where each curve reaches the accuracy of the reference solution.}
+	\label{fig:error_order}
+\end{figure}
+
+Figure~\ref{fig:error_order} shows that all three errors rise slightly at low order and then fall steadily, as Theorem~\ref{thm:HAM_convergence} predicts. The error drops below the size of the whole audience ($11.5$) after $8$ terms for HAM and $16$ terms for HPM. An error below $10^{-2}$ needs $12$ terms for HAM and $21$ for HPM, and an error below $10^{-6}$ needs $18$ and $28$ terms, as the bar chart shows. HAM reaches the accuracy of the reference solution at $26$ terms and HPM at $35$, so HAM saves about ten terms at every accuracy level. The choice $\hbar=-0.9$ needs two or three terms more than $\hbar=-0.8$ at the first two levels, and the two curves are close from $22$ terms onward.
+
+\begin{longtable}{@{}p{2.2cm}p{3.6cm}p{3.6cm}@{}}
+	\caption{Largest error on $[0,10]$ weeks against the number of terms $M$.}
+	\label{tab:error_order}\\
+	\toprule
+	\textbf{Order $M$} & \textbf{HAM, $\hbar=-0.8$} & \textbf{HPM, $\hbar=-1$} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{3}{l}{\small\textit{Table~\ref{tab:error_order} continued}}\\
+	\toprule
+	\textbf{Order $M$} & \textbf{HAM, $\hbar=-0.8$} & \textbf{HPM, $\hbar=-1$} \\
+	\midrule
+	\endhead
+	\bottomrule
+	\endlastfoot
+	$10$ & $1.9\times10^{-1}$ & $5.6\times10^{2}$ \\[3pt]
+	$15$ & $7.2\times10^{-5}$ & $1.3\times10^{1}$ \\[3pt]
+	$20$ & $3.7\times10^{-8}$ & $3.0\times10^{-2}$ \\[3pt]
+	$25$ & $2.2\times10^{-11}$ & $2.3\times10^{-5}$ \\[3pt]
+	$30$ & $2.7\times10^{-12}$ & $3.1\times10^{-8}$ \\
+\end{longtable}
+
+Table~\ref{tab:error_order} confirms this. At $M=10$ the HPM error of $560$ is about fifty times the audience, and the HAM error of $0.19$ is still too large. At $M=20$, HAM ($3.7\times10^{-8}$) is as accurate as HPM at $M=30$ ($3.1\times10^{-8}$). The value $2.7\times10^{-12}$ for HAM at $M=30$ is the accuracy limit of the reference solution, not a limit of the series.
+
+\subsection{Discussion of Findings}
+
+The audience obeys $\dot N=\Lambda-\mu N$, which has no advertising term. Advertising therefore changes how consumers are spread over the stages, not the size of the audience. The same balance holds in the customer model of \citet{silva2016}, which uses four compartments and numerical simulation. The single rise and fall of the active group in the viral marketing SIR model of \citet{rodrigues2015} is split here into successive peaks in the exposed, engaged and converted groups. Neither study gives a series solution.
+
+For the method, \citet{rafiullah2024} solved a six-compartment model by HPM and checked it against Runge--Kutta. \citet{rangkuti2021} used HAM on a SEIR model and report differences near $10^{-7}$, close to our $3.7\times10^{-8}$, although the models and error measures differ. \citet{sajid2013} and \citet{ratchagar2014} also found that $\hbar$ controls accuracy. Their models are nonlinear, so $\hbar$ can decide convergence, whereas here convergence holds at $\hbar=-1$ and $\hbar$ mainly affects speed. Since HPM is HAM at $\hbar=-1$ \citep{liao2005}, its series here, for constant controls, is the Taylor series, which explains its late-week error. Our order-by-order errors respond to the concern of \citet{aljoufi2024} that HPM accuracy is rarely checked.
+
+The series are polynomials in time, so each order is accurate only on a finite interval, here 10 weeks, and a 52-week horizon would need hundreds of terms. The controls were held constant, the parameters were taken from the literature, and $\hbar$ was chosen by comparison with a numerical solution.
+

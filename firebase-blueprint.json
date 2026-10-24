@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "CustomModel": {
+      "title": "CustomModel",
+      "description": "Represents a user-created ODE / compartment model with equations, parameters, and derivation configuration.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique model ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Owner email address"
+        },
+        "title": {
+          "type": "string",
+          "description": "Descriptive title of the mathematical model",
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "description": "Summary or biological context of the system",
+          "maxLength": 1000
+        },
+        "equations": {
+          "type": "array",
+          "description": "LaTeX strings of ODE compartment balance equations"
+        },
+        "compartments": {
+          "type": "array",
+          "description": "List of state variables / compartments"
+        },
+        "parameters": {
+          "type": "array",
+          "description": "List of biological/rate parameters"
+        },
+        "defaultParams": {
+          "type": "object",
+          "description": "Default numerical parameter dictionary"
+        },
+        "defaultInitialConditions": {
+          "type": "object",
+          "description": "Initial values at t=0"
+        },
+        "derivationMethod": {
+          "type": "string",
+          "description": "Preferred analytical method: HAM, HPM, ADM, VIM, or DTM"
+        },
+        "derivationNotes": {
+          "type": "string",
+          "description": "Saved paper notes or derivation summaries",
+          "maxLength": 5000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp"
+        }
+      },
+      "required": ["userId", "title", "equations", "createdAt", "updatedAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with display info and preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User full name or display handle"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Profile picture URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account creation time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Profile update time"
+        }
+      },
+      "required": ["userId", "email", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/models/{modelId}": {
+      "schema": {
+        "$ref": "#/entities/CustomModel"
+      },
+      "description": "User custom ODE models and mathematical configurations"
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "User account and profile data"
+    }
+  }
+}
